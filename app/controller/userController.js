@@ -15,8 +15,8 @@ const signup = async (req, res) => {
         if (finuser) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, message: "This Email Is Already Taken !" })
 
         const bpass = await bcrypt.hash(password, 10)
-        new userModel({ ...req.body, password: bpass }).save()
-        return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, message: "User Registered Successfully !" })
+        const newUser = new userModel({ ...req.body, password: bpass });
+        await newUser.save();        return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, message: "User Registered Successfully !" })
 
     } catch (error) {
         console.log("🚀 ~ signup ~ error:", error)
