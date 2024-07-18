@@ -45,8 +45,19 @@ const login = async (req, res) => {
 }
 
 
+const All_user = async (req, res) => {
+    try {
+        const findall = await userModel.find()
+        return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, message: "All user !", findall })
+
+    } catch (error) {
+        return res.status(HTTP.SUCCESS).send({ code: HTTP.INTERNAL_SERVER_ERROR, status: false, message: "Something Went Wrong !", });
+    }
+}
+
 
 module.exports = {
     signup,
-    login
+    login,
+    All_user
 }
