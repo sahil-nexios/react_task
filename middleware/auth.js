@@ -1,5 +1,5 @@
 const passport = require("passport");
-const HTTP = require("../../constants/resCode");
+const HTTP = require("../constants/resCode");
 
 async function authUser(req, res, next) {
   // console.log("req.headers.authenticated", req.headers.authorization)
