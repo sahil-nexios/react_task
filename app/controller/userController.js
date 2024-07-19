@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const userModel = require("../model/usermodel");
+const taskModel = require("../model/taskmodel");
 const HTTP = require("../../constants/resCode");
 const bcrypt = require('bcrypt');
 
@@ -57,8 +58,105 @@ const All_user = async (req, res) => {
 }
 
 
+const Add_task = async (req, res) => {
+    try {
+        const { title, description } = req.body
+        if (!title || !description) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, message: "All Fields Are Required !" })
+        const newUser = new taskModel({ ...req.body, userid: req.user._id });
+        await newUser.save();
+        return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, message: "Task Created Succesfully !" })
+    } catch (error) {
+        console.log("🚀 ~ constAdd_task= ~ error:", error)
+        return res.status(HTTP.SUCCESS).send({ code: HTTP.INTERNAL_SERVER_ERROR, status: false, message: "Something Went Wrong !", });
+    }
+}
+
+const All_task = async (req, res) => {
+    try {
+        const findall = await taskModel.find({ userid: req.user._id })
+        if (findall.length <= 0) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.NOT_FOUND, message: "Task Not Found !" })
+        return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, message: "All Task !", findall })
+
+    } catch (error) {
+        console.log("🚀 ~ constAll_task= ~ error:", error)
+        return res.status(HTTP.SUCCESS).send({ code: HTTP.INTERNAL_SERVER_ERROR, status: false, message: "Something Went Wrong !", });
+    }
+}
+
+
+const view_single_task = async (req, res) => {
+    try {
+        if (!req.params.id) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.NOT_FOUND, message: "params id not found !" })
+        const findall = await taskModel.findOne({ _id: req.params.id })
+        if (!findall) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.NOT_FOUND, message: "Task Not Found !" })
+        return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, message: "Task !", findall })
+
+    } catch (error) {
+        console.log("🚀 ~ constview_single_task= ~ error:", error)
+        return res.status(HTTP.SUCCESS).send({ code: HTTP.INTERNAL_SERVER_ERROR, status: false, message: "Something Went Wrong !", });
+    }
+}
+
+const task_status = async (req, res) => {
+    try {
+        const { completed } = req.body
+        if (!completed) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, message: "completed Fields Are Required !" })
+        const findall = await taskModel.findOne({ _id: req.params.id })
+        if (!findall) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.NOT_FOUND, message: "Task Not Found !" });
+        const updatetsk = await taskModel.findByIdAndUpdate(req.params.id, {
+            $set: {
+                completed: completed
+            }
+        })
+        if (!updatetsk) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, message: "Status Not Updated !" })
+        return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, message: "Status Updated Succesfully !" })
+
+    } catch (error) {
+        console.log("🚀 ~ consttask_status= ~ error:", error)
+        return res.status(HTTP.SUCCESS).send({ code: HTTP.INTERNAL_SERVER_ERROR, status: false, message: "Something Went Wrong !", });
+    }
+}
+
+const update_task = async (req, res) => {
+    try {
+        const findall = await taskModel.findOne({ _id: req.params.id })
+        if (!findall) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.NOT_FOUND, message: "Task Not Found !" });
+        const updatetsk = await taskModel.findByIdAndUpdate(req.params.id, {
+            $set: { ...req.body }
+        })
+        if (!updatetsk) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, message: "Task Not Updated !" })
+        return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, message: "Task Updated Succesfully !" })
+    } catch (error) {
+        console.log("🚀 ~ constupdate_task= ~ error:", error)
+        return res.status(HTTP.SUCCESS).send({ code: HTTP.INTERNAL_SERVER_ERROR, status: false, message: "Something Went Wrong !", });
+    }
+}
+
+const delete_task = async (req,res) => {
+    try {
+        const findall = await taskModel.findOne({ _id: req.params.id })
+        if (!findall) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.NOT_FOUND, message: "Task Not Found !" });
+        const deletetsk = await taskModel.findByIdAndDelete(req.params.id)
+        if (!deletetsk) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, message: "Task Not Deleted !" })
+
+        return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, message: "Task Deleted Succesfully !" })
+    } catch (error) {
+        console.log("🚀 ~ constdelete_task= ~ error:", error)
+        return res.status(HTTP.SUCCESS).send({ code: HTTP.INTERNAL_SERVER_ERROR, status: false, message: "Something Went Wrong !", });
+    }
+}
+
+
+
+
 module.exports = {
     signup,
     login,
-    All_user
+    All_user,
+    Add_task,
+    All_task,
+    view_single_task,
+    task_status,
+    update_task,
+    delete_task
 }

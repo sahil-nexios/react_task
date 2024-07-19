@@ -16,7 +16,7 @@ app.use('/upload', express.static('upload'))
 app.use(userRouter);
 
 app.all("*", (req, res) => {
-    res.send(process.env.DB_URL)
+    res.send("URL not found")
 })
 app.listen(PORT, () => {
     console.log(`server is running on port ${PORT}`);
