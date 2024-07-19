@@ -100,7 +100,11 @@ const view_single_task = async (req, res) => {
 const task_status = async (req, res) => {
     try {
         const { completed } = req.body
-        if (!completed) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, message: "completed Fields Are Required !" })
+        const value = completed?.toString();
+
+        if (value === "" || value === null || value === undefined) {
+            return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, message: "completed Fields Are Required !" })
+        }
         const findall = await taskModel.findOne({ _id: req.params.id })
         if (!findall) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.NOT_FOUND, message: "Task Not Found !" });
         const updatetsk = await taskModel.findByIdAndUpdate(req.params.id, {
@@ -111,12 +115,13 @@ const task_status = async (req, res) => {
         if (!updatetsk) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, message: "Status Not Updated !" })
         return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, message: "Status Updated Succesfully !" })
 
+
+
     } catch (error) {
-        console.log("🚀 ~ consttask_status= ~ error:", error)
+        console.log("🚀  consttask_status=  error:", error)
         return res.status(HTTP.SUCCESS).send({ code: HTTP.INTERNAL_SERVER_ERROR, status: false, message: "Something Went Wrong !", });
     }
 }
-
 const update_task = async (req, res) => {
     try {
         const findall = await taskModel.findOne({ _id: req.params.id })
@@ -132,7 +137,7 @@ const update_task = async (req, res) => {
     }
 }
 
-const delete_task = async (req,res) => {
+const delete_task = async (req, res) => {
     try {
         const findall = await taskModel.findOne({ _id: req.params.id })
         if (!findall) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.NOT_FOUND, message: "Task Not Found !" });

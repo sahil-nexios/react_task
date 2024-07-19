@@ -10,11 +10,14 @@ require("./config/connection");
 require('./config/passport');
 app.use(passport.initialize());
 app.use(cors())
+var bodyParser = require('body-parser')
 
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 app.use(express.json())
 app.use('/upload', express.static('upload'))
 app.use(userRouter);
-
 app.all("*", (req, res) => {
     res.send("URL not found")
 })
