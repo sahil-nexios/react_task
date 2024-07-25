@@ -13,6 +13,7 @@ router.get("/view_single_task/:id", authUser, userController.view_single_task)
 router.post("/task_status/:id", authUser, userController.task_status)
 router.post("/update_task/:id", authUser, userController.update_task)
 router.get("/delete_task/:id", authUser, userController.delete_task)
+router.post("/tasks_reorder", authUser, userController.tasks_reorder)
 
 
 

@@ -57,31 +57,41 @@ const All_user = async (req, res) => {
     }
 }
 
-
 const Add_task = async (req, res) => {
     try {
-        const { title, description } = req.body
-        if (!title || !description) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, message: "All Fields Are Required !" })
-        const newUser = new taskModel({ ...req.body, userid: req.user._id });
-        await newUser.save();
-        return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, message: "Task Created Succesfully !" })
+        const { title, description } = req.body;
+
+        if (!title || !description) {
+            return res.status(400).send({ status: false, code: 400, message: "All Fields Are Required!" });
+        }
+
+        const lastTask = await taskModel.findOne({ userid: req.user._id }).sort({ position: -1 });
+        const position = lastTask ? lastTask.position + 1 : 0;
+
+        const newTask = new taskModel({ ...req.body, userid: req.user._id, position });
+        await newTask.save();
+
+        return res.status(201).send({ status: true, code: 201, message: "Task Created Successfully!" });
     } catch (error) {
-        console.log("🚀 ~ constAdd_task= ~ error:", error)
-        return res.status(HTTP.SUCCESS).send({ code: HTTP.INTERNAL_SERVER_ERROR, status: false, message: "Something Went Wrong !", });
+        console.error("🚀 ~ const Add_task = ~ error:", error);
+        return res.status(500).send({ code: 500, status: false, message: "Something Went Wrong!" });
     }
-}
+};
+
 
 const All_task = async (req, res) => {
     try {
-        const findall = await taskModel.find({ userid: req.user._id })
-        if (findall.length <= 0) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.NOT_FOUND, message: "Task Not Found !" })
-        return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, message: "All Task !", findall })
+        const findall = await taskModel.find({ userid: req.user._id }).sort({ position: 1 });
+        if (findall.length === 0) {
+            return res.status(404).send({ status: false, code: 404, message: "Tasks Not Found!" });
+        }
+        return res.status(200).send({ status: true, code: 200, message: "All Tasks Retrieved Successfully!", tasks: findall });
 
     } catch (error) {
-        console.log("🚀 ~ constAll_task= ~ error:", error)
-        return res.status(HTTP.SUCCESS).send({ code: HTTP.INTERNAL_SERVER_ERROR, status: false, message: "Something Went Wrong !", });
+        console.error("🚀 ~ const All_task = ~ error:", error);
+        return res.status(500).send({ code: 500, status: false, message: "Something Went Wrong!" });
     }
-}
+};
 
 
 const view_single_task = async (req, res) => {
@@ -152,6 +162,21 @@ const delete_task = async (req, res) => {
 }
 
 
+const tasks_reorder = async (req, res) => {
+    try {
+        const taskIds = req.body.taskIds;
+        for (let i = 0; i < taskIds.length; i++) {
+            await taskModel.findByIdAndUpdate(taskIds[i], { position: i });
+        }
+        return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, message: "Task Reorder Succesfully !" })
+    } catch (error) {
+        console.log("🚀 ~ consttasks_reorder= ~ error:", error)
+        return res.status(HTTP.SUCCESS).send({ code: HTTP.INTERNAL_SERVER_ERROR, status: false, message: "Something Went Wrong !", });
+
+    }
+}
+
+
 
 
 module.exports = {
@@ -163,5 +188,7 @@ module.exports = {
     view_single_task,
     task_status,
     update_task,
-    delete_task
+    delete_task,
+    tasks_reorder
+
 }

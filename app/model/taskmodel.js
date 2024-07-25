@@ -5,6 +5,8 @@ const newScema = new mongoose.Schema({
     description: { type: String },
     userid: { type: mongoose.Schema.Types.ObjectId },
     completed: { type: Boolean, default: false },
+    position: { type: Number}
+
 })
 
 
