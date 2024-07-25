@@ -165,7 +165,13 @@ const delete_task = async (req, res) => {
 const tasks_reorder = async (req, res) => {
     try {
         const taskIds = req.body.taskIds;
+        const Alltask = await taskModel.find({ userid: req.user._id });
+
+        if (taskIds.length === 0, taskIds.length !== Alltask.length) return res.status(404).send({ status: false, code: 404, message: "Please Provide all Taskid !" });
         for (let i = 0; i < taskIds.length; i++) {
+            if (taskIds[i] === "" || taskIds[i] === null || taskIds[i] === undefined) {
+                return res.status(404).send({ status: false, code: 404, message: "Please Provide Valid Taskid !" });
+            }
             await taskModel.findByIdAndUpdate(taskIds[i], { position: i });
         }
         return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, message: "Task Reorder Succesfully !" })
