@@ -167,7 +167,7 @@ const tasks_reorder = async (req, res) => {
         const taskIds = req.body.taskIds;
         const Alltask = await taskModel.find({ userid: req.user._id });
 
-        if (taskIds.length === 0, taskIds.length !== Alltask.length) return res.status(404).send({ status: false, code: 404, message: "Please Provide all Taskid !" });
+        if (taskIds.length !== Alltask.length) return res.status(404).send({ status: false, code: 404, message: "Please Provide all Taskid !" });
         for (let i = 0; i < taskIds.length; i++) {
             if (taskIds[i] === "" || taskIds[i] === null || taskIds[i] === undefined) {
                 return res.status(404).send({ status: false, code: 404, message: "Please Provide Valid Taskid !" });
