@@ -85,7 +85,7 @@ const All_task = async (req, res) => {
         if (findall.length === 0) {
             return res.status(404).send({ status: false, code: 404, message: "Tasks Not Found!" });
         }
-        return res.status(200).send({ status: true, code: 200, message: "All Tasks Retrieved Successfully!", tasks: findall });
+        return res.status(200).send({ status: true, code: 200, message: "All Tasks !", tasks: findall });
 
     } catch (error) {
         console.error("🚀 ~ const All_task = ~ error:", error);
